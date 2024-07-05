@@ -2,7 +2,7 @@
   "profiles": {
     "azure_functions": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7048",
+      "commandLineArgs": "--port 7114",
       "launchBrowser": false
     }
   }
