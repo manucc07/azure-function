@@ -1,6 +1,12 @@
 name: Test Secret Extraction
 
-on: [push]
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Nombre del entorno'
+        required: true
+        default: 'development'
 
 jobs:
   test-secrets:
@@ -11,7 +17,7 @@ jobs:
 
       - name: Extract and Test Secrets
         run: |
-          echo "Extracting KV Secrets"
+          echo "Extracting KV Secrets for the environment: ${{ github.event.inputs.environment }}"
           for secret_name in $(echo "${{ toJSON(secrets) }}" | jq -r 'keys[] | select(startswith("KV_"))'); do
             # Acceder al valor del secreto en el contexto de Bash
             secret_value=${{ secrets[secret_name] }}
