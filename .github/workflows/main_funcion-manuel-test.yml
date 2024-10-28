@@ -19,15 +19,11 @@ jobs:
         run: |
           echo "Extracting KV Secrets for the environment: ${{ github.event.inputs.environment }}"
 
-          # Obtener los nombres de los secretos que comienzan con "KV_"
-          secrets_list=$(echo "${{ toJSON(secrets) }}" | jq -r 'keys[] | select(startswith("KV_"))')
-          
-          # Iterar sobre la lista de secretos
-          for secret_name in $secrets_list; do
+          # Imprimir todos los secretos que comienzan con "KV_"
+          for secret_name in $(echo "${{ toJSON(secrets) }}" | jq -r 'keys[] | select(startswith("KV_"))'); do
             echo "Processing secret: $secret_name"
-            
-            # Acceder a cada secreto
-            secret_value="${{ secrets[secret_name] }}"
+            # Accede al secreto a través de la expresión de shell
+            secret_value=$(eval echo \${{ secrets.$secret_name }})
 
             echo "Value (hidden): [REDACTED]"  # No imprimas el valor real por seguridad
           done
