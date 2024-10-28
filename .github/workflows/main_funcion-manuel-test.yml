@@ -19,8 +19,8 @@ jobs:
         run: |
           echo "Extracting KV Secrets for the environment: ${{ github.event.inputs.environment }}"
           for secret_name in $(echo "${{ toJSON(secrets) }}" | jq -r 'keys[] | select(startswith("KV_"))'); do
-            # Acceder al valor del secreto en el contexto de Bash
-            secret_value=${{ secrets[secret_name] }}
+            # Acceder al valor del secreto mediante un comando de Bash
+            secret_value=${{ secrets['${secret_name}'] }}  # Se debe usar una variable o un método diferente
 
             echo "Processing secret: $secret_name"
             echo "Value (hidden): [REDACTED]"  # No imprimas el valor real por seguridad
