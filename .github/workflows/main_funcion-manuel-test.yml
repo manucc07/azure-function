@@ -26,6 +26,12 @@ jobs:
           # Obtener los nombres de los secretos que comienzan con "KV_"
           secrets_list=$(echo "${{ toJSON(secrets) }}" | jq -r 'keys[] | select(startswith("KV_"))')
 
+          # Comprobar si se encontraron secretos
+          if [ -z "$secrets_list" ]; then
+            echo "No KV_ secrets found."
+            exit 0
+          fi
+
           # Iterar sobre la lista de secretos
           for secret_name in $secrets_list; do
             echo "Processing secret: $secret_name"
