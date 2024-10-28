@@ -1,52 +1,21 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
-# More GitHub Actions for Azure: https://github.com/Azure/actions
+name: Test Secret Extraction
 
-name: Build and deploy dotnet core app to Azure Function App - funcion-manuel-test
-
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-
-env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
-  DOTNET_VERSION: '8.0.x' # set this to the dotnet version to use
+on: [push]
 
 jobs:
-  build-and-deploy:
-    runs-on: windows-latest
-    permissions:
-      id-token: write #This is required for requesting the JWT
-
+  test-secrets:
+    runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout GitHub Action'
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Setup DotNet ${{ env.DOTNET_VERSION }} Environment
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: 'Resolve Project Dependencies Using Dotnet'
-        shell: pwsh
+      - name: Extract and Test Secrets
         run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          dotnet build --configuration Release --output ./output
-          popd
-      
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_C2084CCA7AF34647ABBC13982C8E1F8C }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_A26D8ECFBF6B47BFAE0CDB2F8ACBDF9E }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_75A59D4F7F8F452C99FE5B86348B98E0 }}
+          echo "Extracting KV Secrets"
+          for secret_name in $(echo "${{ toJSON(secrets) }}" | jq -r 'keys[] | select(startswith("KV_"))'); do
+            # Acceder al valor del secreto en el contexto de Bash
+            secret_value=${{ secrets[secret_name] }}
 
-      - name: 'Run Azure Functions Action'
-        uses: Azure/functions-action@v1
-        id: fa
-        with:
-          app-name: 'funcion-manuel-test'
-          slot-name: 'Production'
-          package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
-          
+            echo "Processing secret: $secret_name"
+            echo "Value (hidden): [REDACTED]"  # No imprimas el valor real por seguridad
+          done
