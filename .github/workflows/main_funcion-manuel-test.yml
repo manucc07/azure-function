@@ -15,15 +15,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Extract and Test Secrets
+      - name: Extract KV Secrets
         run: |
           echo "Extracting KV Secrets for the environment: ${{ github.event.inputs.environment }}"
 
-          # Imprimir todos los secretos que comienzan con "KV_"
-          for secret_name in $(echo "${{ toJSON(secrets) }}" | jq -r 'keys[] | select(startswith("KV_"))'); do
-            echo "Processing secret: $secret_name"
-            # Accede al secreto a través de la expresión de shell
-            secret_value=$(eval echo \${{ secrets.$secret_name }})
+          # Obtener los nombres de los secretos que comienzan con "KV_"
+          secrets_list=$(echo "${{ toJSON(secrets) }}" | jq -r 'keys[] | select(startswith("KV_"))')
 
-            echo "Value (hidden): [REDACTED]"  # No imprimas el valor real por seguridad
+          # Iterar sobre la lista de secretos
+          for secret_name in $secrets_list; do
+            echo "Processing secret: $secret_name"
+            # Aquí podrías realizar más acciones si fuera necesario
           done
