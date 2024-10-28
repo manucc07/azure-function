@@ -15,6 +15,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Print all secrets
+        run: |
+          echo "All secrets: ${{ toJSON(secrets) }}"
+
       - name: Extract KV Secrets
         run: |
           echo "Extracting KV Secrets for the environment: ${{ github.event.inputs.environment }}"
@@ -25,5 +29,4 @@ jobs:
           # Iterar sobre la lista de secretos
           for secret_name in $secrets_list; do
             echo "Processing secret: $secret_name"
-            # Aquí podrías realizar más acciones si fuera necesario
           done
